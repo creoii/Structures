@@ -6,6 +6,7 @@ import creoii.structures.registry.StructurePieceRegistry;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.block.entity.DispenserBlockEntity;
 import net.minecraft.loot.LootTables;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.structure.*;
@@ -31,6 +32,7 @@ public class JungleTempleStructure extends StructureFeature<DefaultFeatureConfig
     private static final Identifier BASE_TEMPLATE = new Identifier(StructuresMod.MOD_ID, "jungle_temple/base");
     private static final Identifier[] TOP_TEMPLATES = new Identifier[]{new Identifier(StructuresMod.MOD_ID, "jungle_temple/tops/top_0"), new Identifier(StructuresMod.MOD_ID, "jungle_temple/tops/top_1")};
     private static final Identifier[] ROOM_TEMPLATES = new Identifier[]{new Identifier(StructuresMod.MOD_ID, "jungle_temple/rooms/room_0"), new Identifier(StructuresMod.MOD_ID, "jungle_temple/rooms/room_1"), new Identifier(StructuresMod.MOD_ID, "jungle_temple/rooms/room_2"), new Identifier(StructuresMod.MOD_ID, "jungle_temple/rooms/room_3"), new Identifier(StructuresMod.MOD_ID, "jungle_temple/rooms/room_4"), new Identifier(StructuresMod.MOD_ID, "jungle_temple/rooms/room_5")};
+    private static final Identifier[] TRAP_TEMPLATES = new Identifier[]{new Identifier(StructuresMod.MOD_ID, "jungle_temple/traps/tnt_trap"), new Identifier(StructuresMod.MOD_ID, "jungle_temple/traps/arrow_trap")};
     private static final Identifier[] PIT_TEMPLATES = new Identifier[]{new Identifier(StructuresMod.MOD_ID, "jungle_temple/pits/pit_0"), new Identifier(StructuresMod.MOD_ID, "jungle_temple/pits/pit_1"), new Identifier(StructuresMod.MOD_ID, "jungle_temple/pits/pit_2")};
     private static final BlockPos[] ROOM_OFFSETS = new BlockPos[]{new BlockPos(8, 1, 8), new BlockPos(15, 1, 8), new BlockPos(8, 1, 15), new BlockPos(15, 1, 15)};
 
@@ -47,8 +49,13 @@ public class JungleTempleStructure extends StructureFeature<DefaultFeatureConfig
 
         Random random = context.random();
         for (BlockPos roomPos : ROOM_OFFSETS) {
+            boolean generatePit = true;
             collector.addPiece(new JungleTempleStructure.Piece(manager, ROOM_TEMPLATES[random.nextInt(ROOM_TEMPLATES.length)], blockPos.add(roomPos)));
             if (random.nextInt(4) == 0) {
+                collector.addPiece(new JungleTempleStructure.Piece(manager, TRAP_TEMPLATES[random.nextInt(TRAP_TEMPLATES.length)], blockPos.add(roomPos).down(1)));
+                generatePit = false;
+            }
+            if (generatePit && random.nextInt(3) == 0) {
                 collector.addPiece(new JungleTempleStructure.Piece(manager, PIT_TEMPLATES[random.nextInt(PIT_TEMPLATES.length)], blockPos.add(roomPos).down(6)));
             }
         }
@@ -75,6 +82,12 @@ public class JungleTempleStructure extends StructureFeature<DefaultFeatureConfig
                 BlockEntity blockEntity = world.getBlockEntity(pos.down());
                 if (blockEntity instanceof ChestBlockEntity) {
                     ((ChestBlockEntity)blockEntity).setLootTable(LootTables.JUNGLE_TEMPLE_CHEST, random.nextLong());
+                }
+            } else if ("dispenser".equals(metadata)) {
+                world.setBlockState(pos, Blocks.MOSSY_COBBLESTONE.getDefaultState(), 3);
+                BlockEntity blockEntity = world.getBlockEntity(pos.up());
+                if (blockEntity instanceof DispenserBlockEntity) {
+                    ((DispenserBlockEntity)blockEntity).setLootTable(LootTables.JUNGLE_TEMPLE_DISPENSER_CHEST, random.nextLong());
                 }
             }
         }
