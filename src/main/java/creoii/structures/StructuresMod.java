@@ -7,7 +7,7 @@ import net.fabricmc.api.ModInitializer;
 public class StructuresMod implements ModInitializer {
     public static final String MOD_ID = "structures";
 
-    //TODO: Cabins, Underground Cabins, Pillager Castles
+    //TODO: Underground Shacks, Pillager Castles, Terracotta Tombs, Larger Monster Dungeons
 
     @Override
     public void onInitialize() {

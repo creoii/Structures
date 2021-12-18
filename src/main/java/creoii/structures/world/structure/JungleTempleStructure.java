@@ -12,11 +12,16 @@ import net.minecraft.structure.*;
 import net.minecraft.structure.processor.BlockIgnoreStructureProcessor;
 import net.minecraft.structure.processor.StructureProcessorLists;
 import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.StructureWorldAccess;
+import net.minecraft.world.gen.StructureAccessor;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.StructureFeature;
 
@@ -71,6 +76,18 @@ public class JungleTempleStructure extends StructureFeature<DefaultFeatureConfig
                 if (blockEntity instanceof ChestBlockEntity) {
                     ((ChestBlockEntity)blockEntity).setLootTable(LootTables.JUNGLE_TEMPLE_CHEST, random.nextLong());
                 }
+            }
+        }
+
+        @Override
+        public void generate(StructureWorldAccess world, StructureAccessor structureAccessor, ChunkGenerator chunkGenerator, Random random, BlockBox chunkBox, ChunkPos chunkPos, BlockPos pos) {
+            Identifier identifier = new Identifier(this.template);
+            super.generate(world, structureAccessor, chunkGenerator, random, chunkBox, chunkPos, pos);
+            StructureProcessorLists.MOSSIFY_70_PERCENT.getList().forEach(structureProcessor -> {
+                this.placementData.addProcessor(structureProcessor);
+            });
+            if (identifier.equals(BASE_TEMPLATE)) {
+                Structure.transformAround(pos, BlockMirror.NONE, BlockRotation.NONE, placementData.getPosition());
             }
         }
     }
